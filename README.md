@@ -130,3 +130,59 @@ src
 ## NAVEGANDO ENTRE PAGINAS
 
 agregaremos links para navegar enter paginas
+
+se utiliza Link de la libreria "next/link"
+no es necesario el uso de a dentro de Link
+
+```js
+import Link from 'next/link'
+
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <p>Estamos en la Home</p>
+      <Link href="/pages/contact">to Contacto</Link>
+    </main>
+  )
+}
+```
+
+usar anchor (a) solo cuando se dirigira a paginas externas
+
+## SEO NEXT/HEAD
+
+en header los navegadores buscan los metas
+
+en nuestro caso debemos crear un archivo layout.js
+
+```js
+import { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: 'Contacto | next<',
+  description: 'Página de contacto de la aplicación Next.js"',
+  authors: [{ name: 'Cesar Contreras', url: 'http://www.cesarcontreras.com' }]
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="es">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
+```
+
+dentro del objeto metadata agregar lo necesario
+
+# SECCION 5 INICIANDO PROYECTO DE STRAPI BACKEND
+
+## Creando App y registrando admin
+
+todo se creara con strapi.io
+
+crear carpeta
+e-commerce + nextjs + strapi
