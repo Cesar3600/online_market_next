@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation'
 const Game = () => {
   const { platform, game } = useParams()
   console.log('plat', platform)
-  return <div>Game</div>
+  return <div>{`Game ${game} for ${platform}`}</div>
 }
 
 export default Game
