@@ -385,7 +385,9 @@ crearmos un nuevo httprequest
 lo nombramos updateMe
 de tipo PUT
 
+```js
 {{ _.BASE_PATH }}/api/users/1
+```
 
 en headers
 nuevo campo Bearer {{ _.TOKEN }}
@@ -396,10 +398,93 @@ se vizualiza el objeto con propiedades entre ellas firstname y lastname
 
 cambiar body por JSON
 
+```js
 {
 "firstname":"Cesar Arturo",
 "lastname":"Contreras Alva"
 }
+```
 
 y al dar send cambiara el objeto resultante
-lo que significa que esta actualizando
+lo que significa que esta actualizando.
+
+#SECCION 7: SISTEMA DE DIRECCIONES BACKEND
+
+## creando el modelo address:
+
+modelo para cuando un usuario haga un pedido
+entonces hay que ver a donde mandarle ese pedido
+
+### en strapi
+
+content-type Builder/ create new collection type
+se abrira un modal donde se ingresa el nombre que sera: address
+
+en advance settings
+ninguna de las opciones debe estar marcada
+
+seleccionamos textfield
+
+nombre: address
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: name
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: address
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: city
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: state
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: postal_code
+shortfield
+en advance settings required field
+agregar otro campo
+
+nombre: phone
+shortfield
+en advance settings required field
+agregar otro campo
+
+ahora relacionemos al usuario con address
+
+seleccionamos relations
+
+se presenta dos cuadros con una relacion entre ellas
+
+en la segunda caja seleccionar User (from user-permissions)
+
+en la primera caja colocar el nombre user
+
+y en la relacion la primera
+
+click en finish
+click en save
+
+con esto reiniciara el servidor y creara la coleccion que hemo seteado
+
+veras las 2 tipos de colecciones user y address
+
+## endpoint para crear direcciones
+
+## endpoint para obtener direcciones
+
+## endpoint para eliminar direcciones
+
+## endpoint para actualizar direcciones
+
+## endpoint para obtener direccion por su id
