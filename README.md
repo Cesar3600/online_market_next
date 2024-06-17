@@ -408,7 +408,7 @@ cambiar body por JSON
 y al dar send cambiara el objeto resultante
 lo que significa que esta actualizando.
 
-#SECCION 7: SISTEMA DE DIRECCIONES BACKEND
+# SECCION 7: SISTEMA DE DIRECCIONES BACKEND
 
 ## creando el modelo address:
 
@@ -425,48 +425,29 @@ ninguna de las opciones debe estar marcada
 
 seleccionamos textfield
 
-nombre: address
-shortfield
-en advance settings required field
-agregar otro campo
+- nombre: title
+  shortfield
+  en advance settings required field
+  agregar otro campo
 
-nombre: name
-shortfield
-en advance settings required field
-agregar otro campo
+lo mismo para:
 
-nombre: address
-shortfield
-en advance settings required field
-agregar otro campo
-
-nombre: city
-shortfield
-en advance settings required field
-agregar otro campo
-
-nombre: state
-shortfield
-en advance settings required field
-agregar otro campo
-
-nombre: postal_code
-shortfield
-en advance settings required field
-agregar otro campo
-
-nombre: phone
-shortfield
-en advance settings required field
-agregar otro campo
+- nombre: name
+- nombre: address
+- nombre: city
+- nombre: state
+- nombre: postal_code
+- nombre: phone
 
 ahora relacionemos al usuario con address
 
-seleccionamos relations
+### IMPORTNTISIMO
+
+seleccionamos relations DE LA LISTA DE TIPOS DE CAMPO
 
 se presenta dos cuadros con una relacion entre ellas
 
-en la segunda caja seleccionar User (from user-permissions)
+en la segunda caja(derecha) seleccionar User (from user-permissions)
 
 en la primera caja colocar el nombre user
 
@@ -479,12 +460,311 @@ con esto reiniciara el servidor y creara la coleccion que hemo seteado
 
 veras las 2 tipos de colecciones user y address
 
+cuando selecciones addres abra un boton llamado "create new entry"
+
+mostrara un formulario conn los campos asignados anteriormente
+
+en mi caso cree una nueva entrada agregue los datos y lo relacione con el usuario cesar3600
+
 ## endpoint para crear direcciones
 
-## endpoint para obtener direcciones
+como solo los usuarios autenticados deben poder crear direcciones entonces
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / authenticated
+
+permision
+seccion address
+check en create
+
+se creara un endpoint
+/api/addresses
+con el metodo POST
+
+en insomnia:
+
+crear carpeta address a nivel de las otras carpetas (user, auth)
+crear httprequest renombrarlo como CreateAddress
+crear una url con la base mas el /api/addresses
+
+como es una peticion en Headers
+crear un campo
+Authorization Bearer \_.TOKEN
+
+como hay que mandar algo ya que es POST
+en body cambiar a JSON
+
+y agregar el siguiente objeto
+
+```js
+{
+	"data":{
+		"title":"Oficina valencia",
+		"name":"Agustin navarro",
+		"address":"Calle gardenias 333",
+		"city":"Lima",
+		"state":"Lima",
+		"postal_code":"15311",
+		"phone":"98009899",
+		"user":"1"
+	}
+}
+```
+
+en user va 1 por que es el id del user en GetMe en insomnia
+
+## endpoint para obtener direcciones propias
+
+para obtener las direcciones del usuario
+
+buscamos la documentacion de strapi REST API en el area developer resources
+buscar api parameters
+en este caso nos interesa el filtering, vijarse en los operadores como el $eq, $ne, etc
+
+### en strapi
+
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / authenticated / seccion adress
+
+mantener seleccionado create y find
+
+click en "save"
+
+### en insomnia
+
+crear en carpeta address un nuevo HTTP Request
+GET GetMyAddresses
+
+agregar {{ _.BASE_PATH }}/api/addresses
+
+como necesita obtener datos necesita estar autenticado
+por lo tanto en Headers
+agregar campo
+
+Authorization
+Bearer {{ _.TOKEN }}
+
+si damos clic a "send" va mostrar todas las direcciones
+pero como queremos una en especifico tenemos que editar la url de GET
+
+para entender mejor como trabaja los filtros
+
+{{ _.BASE_PATH }}/api/addresses?populate=\*
+que mostrar todo el objeto:
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "attributes": {
+        "title": "Mi casa",
+        "name": "cesar contreras",
+        "address": "Jr. Sanchez Cerro 371",
+        "city": "lima",
+        "state": "lima",
+        "postal_code": "15311",
+        "phone": "934522259",
+        "createdAt": "2024-06-17T01:00:22.740Z",
+        "updatedAt": "2024-06-17T01:00:22.740Z",
+        "user": {
+          "data": {
+            "id": 1,
+            "attributes": {
+              "username": "cesar3600",
+              "email": "cesar.contreras.medina.3600@gmail.com",
+              "provider": "local",
+              "confirmed": true,
+              "blocked": false,
+              "createdAt": "2024-06-15T23:15:08.175Z",
+              "updatedAt": "2024-06-16T02:11:34.668Z",
+              "firstname": "Cesar Arturo",
+              "lastname": "Contreras Alva"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "attributes": {
+        "title": "Oficina valencia",
+        "name": "Agustin navarro",
+        "address": "Calle gardenias 333",
+        "city": "Lima",
+        "state": "Lima",
+        "postal_code": "15311",
+        "phone": "98009899",
+        "createdAt": "2024-06-17T04:31:26.807Z",
+        "updatedAt": "2024-06-17T04:31:26.807Z",
+        "user": {
+          "data": {
+            "id": 1,
+            "attributes": {
+              "username": "cesar3600",
+              "email": "cesar.contreras.medina.3600@gmail.com",
+              "provider": "local",
+              "confirmed": true,
+              "blocked": false,
+              "createdAt": "2024-06-15T23:15:08.175Z",
+              "updatedAt": "2024-06-16T02:11:34.668Z",
+              "firstname": "Cesar Arturo",
+              "lastname": "Contreras Alva"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "attributes": {
+        "title": "Oficina navarrete",
+        "name": "Adolfo manuel aguilar novoa",
+        "address": "jr. navarrete 777",
+        "city": "Lima",
+        "state": "Lima",
+        "postal_code": "15333",
+        "phone": "945222123",
+        "createdAt": "2024-06-17T04:34:32.844Z",
+        "updatedAt": "2024-06-17T04:34:32.844Z",
+        "user": {
+          "data": {
+            "id": 2,
+            "attributes": {
+              "username": "adolfo",
+              "email": "dolfo@gmail.com",
+              "provider": "local",
+              "confirmed": false,
+              "blocked": false,
+              "createdAt": "2024-06-17T04:32:44.341Z",
+              "updatedAt": "2024-06-17T04:32:44.341Z",
+              "firstname": "adolfo",
+              "lastname": "aguilar"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 25,
+      "pageCount": 1,
+      "total": 3
+    }
+  }
+}
+```
+
+no es necesario agregar data, solo user e id
+
+```json
+				"user": {
+					"data": {
+						"id": 2,
+```
+
+entonces si queremos filtrar por el usuario 1 seria:
+
+{{ _.BASE_PATH }}/api/addresses?filters[user][id][$eq]=1
+
+"$eq" es el operador de strapi para buscar igualdad
+
+doc
+https://docs.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering
 
 ## endpoint para eliminar direcciones
 
+### en strapi
+
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / authenticated / seccion adress
+
+mantener seleccionado create, find y agreggamos delete
+
+### insomnia
+
+Crear hhtpRequest renombrarlo como DeleteAddress dentro de carpeta Adrdress
+
+url
+DELETE: {{ _.BASE_PATH }}/api/addresses/:id
+
+agregar authorization en Headers
+Authorization
+Bearer {{ _.TOKEN }}
+
+y en la url cambiar el :id por el id que quiere eliminar
+{{ _.BASE_PATH }}/api/addresses/6
+
+en este ejemplo se elimino el registro con el id = 6
+
 ## endpoint para actualizar direcciones
 
+### en strapi
+
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / authenticated / seccion adress
+
+mantener seleccionado create, find, delete y agregamos update
+
+### insomnia
+
+Crear hhtpRequest renombrarlo como UpdateAddress dentro de carpeta Adrdress
+
+url
+PUT: {{ _.BASE_PATH }}/api/addresses/:id
+
+agregar authorization en Headers
+Authorization
+Bearer {{ _.TOKEN }}
+
+y en la url cambiar el :id por el id que quiere actualizar
+
+{{ _.BASE_PATH }}/api/addresses/1
+
+en body cambiarlo a json y colocar
+
+```json
+{
+  "data": {
+    "address": "Los aloes #613, SJL"
+  }
+}
+```
+
+No es necesario pasar todos los datos, solo parcialmente los datos que necesites cambiar.
+en este caso se cambio la direccion del objeto con el id 1
+
 ## endpoint para obtener direccion por su id
+
+### en strapi
+
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / authenticated / seccion adress
+
+mantener seleccionado create, find, uopdate, delete y agregamos findOne
+
+### insomnia
+
+Crear hhtpRequest renombrarlo como GetAddressById dentro de carpeta Adrdress
+
+url
+GET: {{ _.BASE_PATH }}/api/addresses/:id
+
+agregar authorization en Headers
+Authorization
+Bearer {{ _.TOKEN }}
+
+y en la url cambiar el :id por el id que quiere actualizar
+
+{{ _.BASE_PATH }}/api/addresses/1
+
+solo se mostrara el objeto con el id que esta buscando
+
+# SECCION 8: sistema de plataformas backend
+
+## creando el modelo de plataformas
+
+## endpoints para obtener plataformas
+
+## endpoints para obtener una plataforma por su slug
