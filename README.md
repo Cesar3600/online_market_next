@@ -765,6 +765,320 @@ solo se mostrara el objeto con el id que esta buscando
 
 ## creando el modelo de plataformas
 
+modelo de plataformas donde pertenecen os juegos
+crearemos un nuevo tipo de coleccion
+
+en content-type builder / collection types / + create new single type
+
+display name: Platform
+
+agregaremos campos:
+
+add "new text field"
+name: title
+check required field
+
+agregar campo UID
+name: slug
+attached field: title (por que queremos que el nombre en minusculas aparesca como slug)
+de tipo obligatorio o requerido
+
+agregar campo number
+name: order
+number format: integer
+y de tipo obligatorio o requerido
+
+para el logo:
+agregar new media field
+name: images
+
+select alowed types of media: solo seleccionar images(jpg, png,..)
+que sea campo requerido u obligatorio
+
+click en "save"
+
+una vez salvado ir a "Content Manager"
+seleccionar Platform
+aqui crearemos una nueva plataforma
+
+clic en "create new entry"
+
+title: PlayStation
+slug: actualizar y dejarlo como playstation
+order: 1
+logo: arrastrar logo de playstation
+clic "save"
+clic publicar
+
+hacer lo mismo para pc, switch y xbox.
+
 ## endpoints para obtener plataformas
 
+creamos 4 plataformas: playstation, xbox, pc y nintendo switch
+
+### en strapi
+
+seleccionamos en strapi:  
+settings / users & permissions plugin / roles / public / platform /
+clic en find
+
+copiar endpoint:
+/api/platforms
+
+clic 'save'
+
+### insomnia
+
+Crear una nueva carpeta Platform
+Crear un httpRequest renombrarlo como GetAll
+
+url
+GET: {{ _.BASE_PATH }}/api/platforms
+
+Dando clic a "send" se mostrara todas las plataformas
+sin embargo estos resultados no tienen la imagen
+para visualizar todos los campos aplicar
+
+```js
+{{ _.BASE_PATH }}/api/platforms?populate = *
+```
+
+en este caso mejor usar icon : populate = icon
+
 ## endpoints para obtener una plataforma por su slug
+
+queremos que mediante el slug me devuelva los datos de la plataforma
+no hay que activar ningun endpoint
+
+Crear un nuevo hhtrequest
+GET | GetBySlug
+
+```js
+GET | {{ _.BASE_PATH }}/api/platforms?filters[slug][$eq]=nintendoswitch
+```
+
+estamos filtrando utilizando el slug buscando un valor igual a nintendoswitch
+
+# SECCION 9: Sistema de juegos backend
+
+## Creando el modelo de juego
+
+### en strapi
+
+seleccionamos en strapi:  
+Content-Type Builder / collection types / create new collection type
+displayname : Game
+
+agregar campos:
+tipo: textfield
+name: title
+required
+
+tipo: relation
+en el segundo cuadro seleccionar: platform y cambiara el primer cuadro a platform
+platform --- primera opcion(game tiene una plataforma) ---platform
+
+tipo: number
+name: price
+number format: decimal
+required
+
+tipo: number
+name: discount
+number format: integer
+
+tipo: uid
+name: slug
+attached field : title
+required
+
+tipo: textfield
+name: summary
+long term
+required
+
+tipo: textfield
+name: video
+required
+
+tipo: media
+name: cover
+single media
+select ype: images
+required
+
+tipo: media
+name: wallpaper
+single media
+select ype: images
+required
+
+tipo: media
+name: screenshots
+multiple media
+select ype: images
+required
+
+tipo: date
+name: releaseDate
+type: date (ex:01/01/2023)
+required
+
+clic 'finish'
+clic "save"
+
+ahoa ingresaremos un registro
+Content manager / create an entry
+
+CREAR POR LO MENOS 15 ENTRADAS DE JUEGOS
+
+## Endpoint para obtener juego
+
+para activaremos el end point para los videojuegos
+como son datos publicos tiene que ser publicos
+
+### en strapi
+
+settings / users & permissions plugin / roles / public
+seleccionar games y seleccionar find
+
+endpoint: GET /api/games
+
+### en insomnia
+
+crear carpeta Games
+agregar httprequest renombrarlo como GetAll
+en url: {{ _.BASE_PATH }}/api/games
+clic en "send" mostrar todos los registros de juegos.
+
+## Endpoint para obtener un juego con su ID
+
+### en strapi
+
+settings / users & permissions plugin / roles / public
+seleccionar games y seleccionar findOne
+
+endpoint: GET /api/games/:id
+
+### en insomnia
+
+crear carpeta Games
+agregar httprequest renombrarlo como GetGameById
+en url: {{ _.BASE_PATH }}/api/games/3
+clic en "send" el registro del juegos segun su id.
+
+# SECCION 10: sistema de lista de deseos
+
+## creando el modelo de la lista de deseos
+
+En Content-Type Builder / collection types / create
+
+llamarla wishlist
+
+agregar campos
+
+tipo: relation
+en el segundo cuadro seleccionar: User (from: users-permissions) y cambiara el
+nombre a users-permissions, cambiarlo a user.
+user --- primera opcion ---users-permissions (se vera vacio)
+
+tipo: relation
+en el segundo cuadro seleccionar: Game y cambiara a game
+game --- primera opcion ---game (pero se visualizara vacio)
+
+la idea es que ese usuario tiene ese jueg en su lista de deseo por eso son esos 2 campos:
+user y game.
+
+clic en 'save'
+
+ahora crearemos una nueva entrada
+
+en content manager / Wishlist / create an entry
+
+seleccionar un usuario y un juego salvar y publicar
+
+## Endpoint para anadir a la lista de deseos
+
+### en strapi
+
+settings / users & permissions plugin / roles / authenticate
+en el area whistlist y seleccionar create
+
+endpoint: POST /api/wishlists
+
+clic en "save"
+
+### en insomnia
+
+crear carpeta Wishlist
+agregar httprequest renombrarlo como AddWishlist
+
+en url: POST {{ _.BASE_PATH }}/api/wishlists
+
+en Headers darle permisos
+
+Authorization
+Bearer {{ _.TOKEN }}
+
+en Body cambiarlo por JSON
+
+```json
+{
+  "data": {
+    "user": "1",
+    "game": "3"
+  }
+}
+```
+
+aqui al ingresar el valor veras que el juego no se ha agregado al registro en wishlist en insomnia
+esto es por que el sistema no consigue obtener el juego con ese id, lo que pasa es que no tiene
+habilitada la opcion de buscar un juego con el endpoint
+
+para esto primero eliminamos el registro de wishlist que tiene el error en la columna game
+
+luego vamos a settings / user & permissions plugin / roles / Authenticated /games
+check en find y salvamos
+
+entramos a authenticated por que en insomnia el hhttp request necesita permisos de authentificacion
+por lo tanto game tambien debe estar autentificado ya que es su descendente
+
+lo que pasa es que strapi cuando le mandas un dato relacionado lo que hace es buscar mediante su id
+
+en nuestro caso le pasamos user: 1 y game:3
+entonces primero busca el id 1 de user y como user tiene activado el find entonces funciona. Pero
+como game no tiene el find actiado entonces no puede encontrar el id 3
+
+clic en "send" el registro del juegos segun su id.
+
+## Endpoint chequear un juego
+
+### en strapi
+
+esto es para saber si hemos marcado un juego como favorito o no
+vamos a settings / user & permissions plugin / roles / Authenticated /wishlist
+check en find y "save"
+
+copia el endpoint
+
+GET | /api/wishlists
+
+clic "save"
+
+la idea es que busquemos filtrando con find si un registro contiene el id del usuario registrado y el id del nombre de la columna game que esta registrada.
+
+### en insomnia
+
+Dentro de la carpeta Wishlist
+agregar httprequest renombrarlo como CheckGameWishlist
+
+en url: GET {{ _.BASE_PATH }}/api/wishlists
+
+en Headers darle permisos
+
+Authorization
+Bearer {{ _.TOKEN }}
+
+## Endpoint para eliminar un juego de la lista
+
+## Endpoint para obtener la lista de deseos
