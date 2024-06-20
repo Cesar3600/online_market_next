@@ -1070,15 +1070,245 @@ la idea es que busquemos filtrando con find si un registro contiene el id del us
 ### en insomnia
 
 Dentro de la carpeta Wishlist
-agregar httprequest renombrarlo como CheckGameWishlist
+agregar httprequest renombrarlo como "CheckGameWishlist".
 
 en url: GET {{ _.BASE_PATH }}/api/wishlists
 
 en Headers darle permisos
 
-Authorization
-Bearer {{ _.TOKEN }}
+Authorization | Bearer {{ _.TOKEN }}
+
+con esto se devuelven todos los registros
+
+Pero mi objetivo es devolver uno
+la idea es buscar por el user y el game que estan registrados en la lista de
+wishlist (o sea a travez de sus ids)
+
+filter / user / id eq = 1
+{{ _.BASE_PATH }}/api/wishlists?filters[user][$eq]=1
+
+con esto solo se devuelven los items que pertenecen al usuario con id 1
+
+ahora la idea es hacer un doble filtrado para buscar dentro de los juegos pertenecientes
+al usuario con el id 1 un juego en especifico ?
+
+{{ _.BASE_PATH }}/api/wishlists?
+
+filters[user][$eq][0]=1 &
+filters[game][$eq][1]=3
+
+{{ _.BASE_PATH }}/api/wishlists?filters[user][$eq][0]=1&filters[game][$eq][1]=3
 
 ## Endpoint para eliminar un juego de la lista
 
+### en strapi
+
+esto es para saber si hemos marcado un juego como favorito o no
+vamos a settings / user & permissions plugin / roles / Authenticated /wishlist
+check en delete y "save"
+
+copia el endpoint
+
+DELETE | /api/wishlists/:id
+
+clic "save"
+
+### en insomnia
+
+Dentro de la carpeta Wishlist
+agregar httprequest renombrarlo como "DeleteGame".
+
+en url: DELETE {{ _.BASE_PATH }}/api/wishlists/:id
+
+en Headers darle permisos
+
+Authorization | Bearer {{ _.TOKEN }}
+
+con esto se elimina el registro que haga match con el id
+del wishlist
+
 ## Endpoint para obtener la lista de deseos
+
+### en strapi
+
+esto es para saber encontrar la lista de deseos
+vamos a settings / user & permissions plugin / roles / Authenticated /wishlist
+check en find y "save"
+
+copia el endpoint
+
+GET | /api/wishlists
+
+clic "save"
+
+### en insomnia
+
+Dentro de la carpeta Wishlist
+agregar httprequest renombrarlo como "GetAll".
+
+en url: GET {{ _.BASE_PATH }}/api/wishlists?filters[user][id][$eq]=1
+
+en Headers darle permisos
+
+Authorization | Bearer {{ _.TOKEN }}
+
+con esto se obtiene la lista de deseados registrados que pertenescan a un usuario
+
+# SECCION 11: sistema de pedidos
+
+## Creando el modelo de pedidos
+
+primero crearemos la coleccion:
+
+### en strapi
+
+content-type builder / create new collection type
+
+name: order
+clic en 'continuar'
+quitar drag and publish desde advance settings
+luego
+agregaremos campos:
+
+tipo: relation
+en el segundo cuadro seleccionar: user-permission y cambiar a user el valor del primer cuadro
+user --- primera opcion(game tiene una plataforma) --- user permissions (vacio)
+
+tipo: number
+name: totalPayment
+decimal
+required
+
+tipo: textfield
+name: idPayment
+
+se trabajara con la plataforma stripe
+para los pagos.
+cuando hacer un pago correcto, stripe te devuelve el ID del pago
+ese id lo podemos guarar en la base de datos para mantenerlo relacionado
+o para saber que id de pago esta relacionado con algun pedido
+
+tipo: JSON
+name: addressShipping
+required
+
+no se emplea una relacion por que si el usuario modifica
+la direccion aqui tambien se va a modificar lo que va ser
+un json llamado addressShipping
+
+tipo: JSON
+name: products
+required
+
+el modelo estaria conformado de la sgte forma:
+
+- user
+- totalPayment
+- idPayment
+- addressShipping
+- products
+
+ahora podemos ver que en la parte Content Manager se visualiza
+la coleccion order.
+
+donde podemos ingresar ordenes
+
+ingrsarems cualquier tipo de dato de ejemplo
+guardar y publicar.
+
+### Endpoint para obtener mis pedidos
+
+### en strapi
+
+ahora hay que ver como obtener todos los pedidos generados
+vamos a settings / user & permissions plugin / roles / Authenticated /order
+check en find y "save"
+
+copia el endpoint
+
+GET | /api/orders
+
+clic "save"
+
+### en insomnia
+
+Crear la carpeta Order
+agregar httprequest renombrarlo como "getAll".
+
+en url: GET {{ _.BASE_PATH }}/api/orders
+
+en Headers darle permisos
+
+Authorization | Bearer {{ _.TOKEN }}
+
+con esto se devuelven todos los registros
+
+Mi objetivo es devolver la lista de pedidos de un usuario por su ID
+
+{{ _.BASE_PATH }}/api/orders?filters[user][id][$eq]=1
+
+de esta forma se obtiene los pedidos de un usuario especifico
+
+## Endpoint para registrar un pedido simple
+
+esto es para pagos contrareembolso
+
+### en strapi
+
+vamos a settings / user & permissions plugin / roles / Authenticated /order
+check en create y "save"
+
+copia el endpoint
+
+POST | /api/orders
+
+clic "save"
+
+### en insomnia
+
+En la carpeta Order
+agregar httprequest renombrarlo como "createOrder".
+
+en url: POST {{ _.BASE_PATH }}/api/orders
+
+en Headers darle permisos
+
+Authorization | Bearer {{ _.TOKEN }}
+
+en boby cambiamos a JSON
+
+{
+"data":{
+"user":1,
+"totalPayment":30,
+"idPayment":"lalalala",
+"addressShipping":"{data:'addressData'}",
+"products":"[{game:'game1'},{game:'game2'}]",
+}
+}
+
+clic en "send"
+
+en content manager se puede visualizar el pedido
+ingresado anteriormente
+
+### Endpoint para pagar y realizar el pedido
+
+Ahora creamos un endproint propio e integracion con stripe
+
+recordemos:
+
+### en strapi
+
+vamos a settings / user & permissions plugin / roles / Authenticated /order
+check en create y "save"
+
+copia el endpoint
+
+POST | /api/orders
+
+ahora tenemos que ir a stripe para iniciar secion con nuestra cuenta
+
+### EN stripe
+
+seleccionar ecommerce next stripe
